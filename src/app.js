@@ -8,10 +8,11 @@ const app = express()
 
 app.use(express.json())
 
-// router
 app.use(indexRoute)
-app.use(imageRoute)
+app.use('/image', imageRoute)
 
-app.listen(PORT, () => console.log(`Server run at ${PORT}`))
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => console.log(`Listening on PORT ${PORT}`))
+}
 
 module.exports = app

@@ -17,8 +17,11 @@ router.get('/', async (req, res) => {
     const endIndex = +page * +limit
 
     const result = {
-        next: {
+        meta: {
             page: currentPage,
+            totalPage: maxPage,
+            previous: currentPage > 1 ? currentPage - 1 : null,
+            next: currentPage < maxPage ? currentPage + 1 : null,
             limit: +limit,
             itemsLength: data.items.length,
         },

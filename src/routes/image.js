@@ -5,14 +5,30 @@ const router = express.Router()
 const url = process.env.FLICKR_URL
 
 router.get('/', async (req, res) => {
-    const { tags } = req.query
-    const includeTags = tags ? `&tags=${tags}` : ''
+    const { tags, page = 1, limit = 6 } = req.query
 
+    const includeTags = tags ? `&tags=${tags}` : ''
     const { data } = await axios.get(`${url}${includeTags}`)
 
-    if (data.items.length === 0) return res.status(404).json({ message: 'No Entry' })
+    const maxPage = Math.ceil(+data.items.length / +limit)
+    const currentPage = +page <= maxPage && +page > 0 ? +page : maxPage
 
-    return res.status(200).json(data)
+    const startIndex = (currentPage - 1) * +limit
+    const endIndex = +page * +limit
+
+    const result = {
+        next: {
+            page: currentPage,
+            limit: +limit,
+            itemsLength: data.items.length,
+        },
+        results: {
+            ...data,
+            items: data.items.slice(startIndex, endIndex),
+        },
+    }
+
+    return res.status(200).json(result)
 })
 
 module.exports = router
